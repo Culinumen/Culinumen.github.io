@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>销量预测系统演示 · 刘问鼎</title>
+<meta name="description" content="新能源汽车销量预测系统：53 款车型、641 条月度记录的历史浏览与模型评估，静态演示版。">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/v2.css">
+<link rel="stylesheet" href="../assets/css/demo.css">
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('theme');
+      var system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = saved || system;
+      document.documentElement.classList.add('js');
+    } catch (e) { /* 忽略 */ }
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">跳到主要内容</a>
+<div class="progress" aria-hidden="true"></div>
+
+<header class="site-header" id="siteHeader">
+  <div class="site-header__inner">
+    <a class="brand" href="../index.html" aria-label="返回首页">
+      <span class="brand__mark" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+          <path d="M6 1v10M1 6h10M2.5 2.5l7 7M9.5 2.5l-7 7"/>
+        </svg>
+      </span>
+      <span>刘问鼎</span>
+      <span class="brand__en">Portfolio</span>
+    </a>
+
+    <div class="site-header__right">
+      <nav class="nav" id="primaryNav" aria-label="主导航">
+        <a href="../index.html">首页</a>
+        <a href="../index.html#work">项目</a>
+        <a href="../index.html#contact">联系</a>
+      </nav>
+
+      <button class="theme-toggle" type="button" id="themeToggle" aria-label="切换深色 / 浅色主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.5 14.2A8.6 8.6 0 1 1 9.8 3.5a7 7 0 0 0 10.7 10.7Z"/>
+        </svg>
+      </button>
+
+      <button class="nav-toggle" type="button" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="展开导航">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="demo-hero">
+    <div class="container">
+      <a class="page-hero__back" href="../projects/nev-policy.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 4 3 8l4 4"/></svg>
+        返回项目
+      </a>
+
+      <div class="kicker">System demo / 系统演示</div>
+      <h1 class="demo-hero__title">新能源汽车销量预测系统</h1>
+      <p class="demo-hero__sub">
+        53 款车型、641 条月度记录：浏览真实历史销量，查看特征工程与模型评估，以及源代码包中保存的示例预测。
+      </p>
+
+      <div class="demo-note">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M8 7.2v4M8 4.9v.9"/></svg>
+        <span><b>静态演示</b>：浏览器里不运行 Python。数据、模型指标与预测结果来自源代码包中的 <code>data/</code>、<code>models/</code>；完整预测能力需要本地启动 FastAPI 后端。</span>
+      </div>
+
+      <div class="demo-kpis">
+        <div class="kpi">
+          <div class="kpi__value" id="kpiVehicles">53</div>
+          <div class="kpi__label">车型</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi__value" id="kpiRecords">641</div>
+          <div class="kpi__label">月度记录</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi__value kpi__value--sm" id="kpiRange">2021-01 — 2024-12</div>
+          <div class="kpi__label">样本区间</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi__value" id="kpiMape">15.84<small>%</small></div>
+          <div class="kpi__label">验证集 MAPE</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== 车型浏览器 ============================== -->
+  <section class="section section--tight">
+    <div class="container">
+      <div class="demo-panel">
+        <div class="demo-panel__head">
+          <div>
+            <div class="kicker">Explorer</div>
+            <h2 class="h2">车型历史与预测</h2>
+          </div>
+
+          <div class="demo-controls">
+            <label class="field">
+              <span class="field__label">车型</span>
+              <select id="vehicleSelect" aria-label="选择车型"></select>
+            </label>
+            <div class="seg" role="group" aria-label="预测期">
+              <button type="button" class="seg__btn is-active" data-horizon="3" aria-pressed="true">3 个月</button>
+              <button type="button" class="seg__btn" data-horizon="6" aria-pressed="false">6 个月</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-wrap" id="chartWrap">
+          <svg id="chart" viewBox="0 0 900 380" role="img" aria-label="车型月度销量历史与预测曲线"></svg>
+          <div class="chart-tip" id="chartTip" hidden></div>
+        </div>
+
+        <div class="demo-stats" id="stats"></div>
+        <p class="demo-hint" id="forecastHint"></p>
+
+        <div class="forecast-table" id="forecastTable"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== 评估 ============================== -->
+  <section class="section section--tight">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Evaluation</div>
+          <h2 class="h2">模型与两个朴素基线</h2>
+        </div>
+        <p class="section-head__note">
+          留出最后 6 个月（2024-07 至 2024-12，141 个样本）做时间切分验证。
+          同时给出 lag-1 与 3 月滚动均值两个基线，避免只报一个好看的数。
+        </p>
+      </div>
+
+      <div class="eval-grid" id="evalGrid"></div>
+
+      <div class="callout eval-callout">
+        <div class="callout__title">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.4 14 13H2L8 2.4Z"/><path d="M8 6.6v3M8 11.4v.8"/></svg>
+          一个诚实的结论
+        </div>
+        <p id="evalNote">
+          梯度提升树相对 3 月滚动均值基线更好，但在这 6 个月上仍略逊于 lag-1 基线（MAE 3673 对 3334）。
+          这说明「用车企上一个月的销量」本身已经很强，模型的价值要靠在更长周期、更多车型上的稳定性来证明，而不是只比一个基线。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== 实现 ============================== -->
+  <section class="section section--tight">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <div class="kicker">Implementation</div>
+          <h2 class="h2">系统怎么搭起来的</h2>
+        </div>
+        <p class="section-head__note">
+          后端 FastAPI + scikit-learn，前端原生 HTML / CSS / JS，不依赖 CDN；从清洗、特征、训练到预测和展示是一条完整链路。
+        </p>
+      </div>
+
+      <ol class="steps">
+        <li><span class="steps__num">01</span><b>数据清洗</b><span>车型名称、月份、能源类型、级别与价格区间标准化，641 条记录进入面板。</span></li>
+        <li><span class="steps__num">02</span><b>特征工程</b><span>时间特征、lag 1/3/6/12、滚动均值与标准差、同比环比，共 20 维特征。</span></li>
+        <li><span class="steps__num">03</span><b>模型训练</b><span>GradientBoostingRegressor：220 棵树、学习率 0.045、深度 3、子采样 0.92，目标取对数。</span></li>
+        <li><span class="steps__num">04</span><b>推理服务</b><span>递归多步预测：把上一步预测写回历史，再构造下一步特征；FastAPI 暴露 6 个接口。</span></li>
+        <li><span class="steps__num">05</span><b>前端展示</b><span>原生 JS 绘制历史/预测曲线与表格，零外部依赖，可离线部署。</span></li>
+      </ol>
+
+      <div class="code-grid">
+        <div class="code-card">
+          <div class="code-card__title">API 接口</div>
+          <pre><code>GET /api/overview
+GET /api/vehicles
+GET /api/history?vehicle_name=
+GET /api/predict?vehicle_name=&amp;horizon=
+GET /api/evaluation
+GET /api/trend?dimension=</code></pre>
+        </div>
+        <div class="code-card">
+          <div class="code-card__title">目录结构</div>
+          <pre><code>backend/   app.py · service/ · utils/
+frontend/  index.html · style.css · app.js
+scripts/   preprocess · train · evaluate · predict
+data/      sample/ · processed/ · output/
+models/    sales_forecast_model.pkl
+config/    config.json · feature_config.json</code></pre>
+        </div>
+        <div class="code-card">
+          <div class="code-card__title">源码</div>
+          <p>完整源代码（含数据样例、模型文件、文档与自检脚本）可以下载：</p>
+          <a class="btn btn--sm" href="../assets/docs/nev-forecast-system.zip" download>
+            下载源代码
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v7M5.5 7.5 8 10l2.5-2.5M3.5 12.5h9"/></svg>
+          </a>
+          <p class="code-card__note">团队项目「水豚噜噜儿队」；公开前请确认合作者同意。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div>
+      <div style="font-weight:600;color:var(--ink);font-size:.92rem">刘问鼎</div>
+      <div style="margin-top:4px">© <span id="year">2026</span> · 能源、政策与数据研究</div>
+    </div>
+    <nav class="footer-nav" aria-label="页脚导航">
+      <a href="../index.html">首页</a>
+      <a href="../projects/nev-policy.html">项目详情</a>
+      <a href="../index.html#contact">联系</a>
+    </nav>
+    <a class="to-top" href="#main">
+      回到顶部
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V3M4 7l4-4 4 4"/></svg>
+    </a>
+  </div>
+</footer>
+
+<script src="../assets/data/forecast.js"></script>
+<script src="../assets/js/main.js" defer></script>
+<script src="../assets/js/demo.js" defer></script>
+</body>
+</html>

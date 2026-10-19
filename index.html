@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>刘问鼎 · 能源、政策与数据研究</title>
+<meta name="description" content="个人作品集：交互式 Gaussian-KAN 的解析初始化与锂离子电池容量保持率预测；新能源汽车消费政策评估与福利核算。">
+<meta name="author" content="刘问鼎">
+<meta property="og:type" content="website">
+<meta property="og:title" content="刘问鼎 · 能源、政策与数据研究">
+<meta property="og:description" content="两个研究项目：电池容量预测中的估计流程比较，与新能源汽车消费政策的效应识别和福利核算。">
+<meta property="og:locale" content="zh_CN">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/v2.css">
+<script>
+  /* 在首次绘制前确定主题，避免闪烁 */
+  (function () {
+    try {
+      var saved = localStorage.getItem('theme');
+      var system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = saved || system;
+      document.documentElement.classList.add('js');
+    } catch (e) { /* 忽略隐私模式下的存储异常 */ }
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">跳到主要内容</a>
+<div class="progress" aria-hidden="true"></div>
+
+<header class="site-header" id="siteHeader">
+  <div class="site-header__inner">
+    <a class="brand" href="index.html" aria-label="返回首页">
+      <span class="brand__mark" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+          <path d="M6 1v10M1 6h10M2.5 2.5l7 7M9.5 2.5l-7 7"/>
+        </svg>
+      </span>
+      <span>刘问鼎</span>
+      <span class="brand__en">Portfolio</span>
+    </a>
+
+    <div class="site-header__right">
+      <nav class="nav" id="primaryNav" aria-label="主导航">
+        <a href="#work">项目</a>
+        <a href="#approach">方法</a>
+        <a href="#skills">技能</a>
+        <a href="#about">关于</a>
+        <a href="#contact">联系</a>
+      </nav>
+
+      <button class="theme-toggle" type="button" id="themeToggle" aria-label="切换深色 / 浅色主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.5 14.2A8.6 8.6 0 1 1 9.8 3.5a7 7 0 0 0 10.7 10.7Z"/>
+        </svg>
+      </button>
+
+      <button class="nav-toggle" type="button" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="展开导航">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ====================================================================
+       HERO
+       ==================================================================== -->
+  <section class="hero">
+    <div class="aurora" aria-hidden="true"><b></b><b></b><b></b></div>
+
+    <div class="container">
+      <div class="hero__grid">
+
+        <div class="hero__text">
+          <div class="hero__kicker">
+            <span>Portfolio · 2026</span>
+            <span class="pill"><span class="pill__dot"></span>开放交流与合作</span>
+          </div>
+
+          <h1 class="hero__title">
+            刘问鼎
+            <span class="hero__title-en">Energy · Policy · Data</span>
+          </h1>
+
+          <p class="hero__lede">
+            用<em>计量识别</em>与<em>可解释模型</em>，回答能源与政策里的实际问题。
+          </p>
+
+          <p class="hero__sub">
+            两个项目，一条共同的方法线索：先把数据口径做实，再用受控的比较或反事实的设计，
+            把「变化」归因到能够被解释的来源上——并且诚实地标出结论的边界。
+          </p>
+
+          <div class="hero__actions">
+            <a class="btn" href="#work">
+              查看项目
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+            <a class="btn btn--ghost" href="#contact">邮件联系</a>
+          </div>
+
+          <div class="hero__meta">
+            <span>可解释机器学习</span>
+            <span>面板计量与政策评估</span>
+            <span>交互式数据系统</span>
+          </div>
+        </div>
+
+        <aside class="profile-card" data-spotlight aria-label="项目索引">
+          <div class="profile-card__top">
+            <div class="monogram" aria-hidden="true">LWD</div>
+            <div>
+              <div class="profile-card__name">刘问鼎</div>
+              <div class="profile-card__role">Research · Data · Policy</div>
+            </div>
+          </div>
+
+          <a class="profile-row" href="projects/gaussian-kan.html">
+            <span class="profile-row__num">01</span>
+            <span>
+              <span class="profile-row__title">交互式 Gaussian-KAN 的解析初始化与分离估计</span>
+              <span class="profile-row__meta">学术论文（投递中）· 3 个电池数据集</span>
+            </span>
+            <svg class="profile-row__arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+
+          <a class="profile-row" href="projects/nev-policy.html">
+            <span class="profile-row__num">02</span>
+            <span>
+              <span class="profile-row__title">新能源汽车消费政策评估与福利核算</span>
+              <span class="profile-row__meta">研究项目 + Web 系统 · 2021—2024 面板</span>
+            </span>
+            <svg class="profile-row__arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+
+          <div class="profile-card__foot">
+            <div class="mini-stat">
+              <div class="mini-stat__value">3<small>个</small></div>
+              <div class="mini-stat__label">电池数据集</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat__value">48<small>个月</small></div>
+              <div class="mini-stat__label">车型面板</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat__value">2<small>个</small></div>
+              <div class="mini-stat__label">完整项目</div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       MARQUEE
+       ==================================================================== -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span class="marquee__item">Gaussian-KAN</span>
+      <span class="marquee__item">变量投影</span>
+      <span class="marquee__item">双向固定效应</span>
+      <span class="marquee__item">反事实模拟</span>
+      <span class="marquee__item">福利核算</span>
+      <span class="marquee__item">电池健康预测</span>
+      <span class="marquee__item">可解释机器学习</span>
+      <span class="marquee__item">面板数据</span>
+      <span class="marquee__item">政策评估</span>
+      <span class="marquee__item">数据可视化</span>
+      <span class="marquee__item">Gaussian-KAN</span>
+      <span class="marquee__item">变量投影</span>
+      <span class="marquee__item">双向固定效应</span>
+      <span class="marquee__item">反事实模拟</span>
+      <span class="marquee__item">福利核算</span>
+      <span class="marquee__item">电池健康预测</span>
+      <span class="marquee__item">可解释机器学习</span>
+      <span class="marquee__item">面板数据</span>
+      <span class="marquee__item">政策评估</span>
+      <span class="marquee__item">数据可视化</span>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       数字带
+       ==================================================================== -->
+  <section class="stats-band" aria-label="关键数字">
+    <div class="container">
+      <div class="stats-band__grid">
+        <div class="stat-block">
+          <div class="stat-block__value"><span data-count="661">661</span></div>
+          <div class="stat-block__label">受控比较的模型参数</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-block__value"><span data-count="23">23</span><small>块</small></div>
+          <div class="stat-block__label">NASA + SDU 测试电池</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-block__value"><span data-count="48">48</span><small>个月</small></div>
+          <div class="stat-block__label">车型—月份面板跨度</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-block__value"><span data-count="2122.98" data-decimals="2">2122.98</span><small>亿元</small></div>
+          <div class="stat-block__label">四年购置税减免成本（基准情景）</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       项目
+       ==================================================================== -->
+  <section class="section" id="work">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <div class="kicker">Selected work / 精选项目</div>
+          <h2 class="h2">两种问题结构，同一套证据标准</h2>
+        </div>
+        <p class="section-head__note">
+          一篇方法取向的论文，一个政策取向的研究系统。前者关心「估计流程本身如何改变预测」，
+          后者关心「财政成本换来的减排与用户收益是否对得上」。
+        </p>
+      </div>
+
+      <!-- 项目一 -->
+      <article class="showcase reveal" data-accent="indigo" data-spotlight>
+        <div class="showcase__media math-visual" data-spotlight>
+          <span class="showcase__badge">Fig. 01 · Manuscript</span>
+
+          <div class="math-visual__stage">
+            <div class="math-visual__aura" aria-hidden="true"></div>
+
+            <svg class="math-svg" viewBox="0 0 880 560" role="img" aria-label="数学风格的容量保持率曲线与估计公式示意">
+              <defs>
+                <linearGradient id="mathArea" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#9fb8d8" stop-opacity=".32"/>
+                  <stop offset="1" stop-color="#9fb8d8" stop-opacity="0"/>
+                </linearGradient>
+                <radialGradient id="mathHalo" cx="50%" cy="42%" r="52%">
+                  <stop offset="0" stop-color="#7f9ec4" stop-opacity=".2"/>
+                  <stop offset="1" stop-color="#7f9ec4" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="mathBlur" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="6"/>
+                </filter>
+                <pattern id="mathGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M40 0H0V40" fill="none" stroke="rgba(255,255,255,.035)" stroke-width="1"/>
+                </pattern>
+              </defs>
+
+              <rect width="880" height="560" fill="#0d1117"/>
+              <rect width="880" height="560" fill="url(#mathGrid)"/>
+              <rect width="880" height="560" fill="url(#mathHalo)"/>
+
+              <circle cx="430" cy="330" r="196" fill="none" stroke="rgba(159,184,216,.10)"/>
+              <circle cx="430" cy="330" r="196" fill="none" stroke="rgba(159,184,216,.2)" stroke-dasharray="2 10"/>
+              <circle class="math-orbit" cx="430" cy="330" r="196" fill="none" stroke="rgba(220,232,248,.5)" stroke-width="1.4" stroke-dasharray="26 210" stroke-linecap="round"/>
+
+              <rect x="596" y="180" width="96" height="250" fill="rgba(139,191,163,.05)"/>
+              <line x1="596" y1="180" x2="596" y2="430" stroke="rgba(139,191,163,.35)" stroke-dasharray="4 6"/>
+
+              <path d="M210 430 C330 430 350 226 430 226 C510 226 530 430 650 430 Z" fill="url(#mathArea)"/>
+              <path d="M210 430 C330 430 350 226 430 226 C510 226 530 430 650 430" fill="none" stroke="#b9cde8" stroke-width="1.8" filter="url(#mathBlur)" opacity=".55"/>
+              <path d="M210 430 C330 430 350 226 430 226 C510 226 530 430 650 430" fill="none" stroke="#dce8f8" stroke-width="1.6"/>
+
+              <line x1="430" y1="226" x2="430" y2="430" stroke="rgba(220,232,248,.28)" stroke-dasharray="4 6"/>
+              <circle cx="430" cy="226" r="14" fill="#dce8f8" opacity=".16" filter="url(#mathBlur)"/>
+              <circle cx="430" cy="226" r="4" fill="#eaf2ff"/>
+              <text x="444" y="219" font-family="Georgia, serif" font-style="italic" font-size="15" fill="rgba(220,232,248,.8)">μ</text>
+
+              <line x1="120" y1="430" x2="760" y2="430" stroke="rgba(255,255,255,.22)"/>
+              <text x="774" y="434" font-family="ui-monospace, monospace" font-size="10" letter-spacing="1.6" fill="rgba(255,255,255,.35)">k</text>
+              <text x="620" y="176" font-family="ui-monospace, monospace" font-size="9.5" letter-spacing="1.4" fill="rgba(139,191,163,.75)">k+H</text>
+
+              <g fill="#dce8f8">
+                <circle class="tw" cx="150" cy="120" r="1.4"/>
+                <circle class="tw" cx="250" cy="88" r="1"/>
+                <circle class="tw" cx="352" cy="140" r="1.2"/>
+                <circle class="tw" cx="520" cy="104" r="1.6"/>
+                <circle class="tw" cx="640" cy="150" r="1"/>
+                <circle class="tw" cx="706" cy="256" r="1.3"/>
+                <circle class="tw" cx="182" cy="300" r="1"/>
+                <circle class="tw" cx="248" cy="360" r="1.5"/>
+                <circle class="tw" cx="690" cy="376" r="1.2"/>
+                <circle class="tw" cx="120" cy="220" r="1"/>
+                <circle class="tw" cx="770" cy="120" r="1.1"/>
+                <circle class="tw" cx="300" cy="200" r="1"/>
+              </g>
+
+              <text x="120" y="500" font-family="ui-monospace, monospace" font-size="10" letter-spacing="2.2" fill="rgba(255,255,255,.3)">CAPACITY RETENTION · ESTIMATION PATHS</text>
+            </svg>
+
+            <span class="mf mf--1" aria-hidden="true">F(z) = D(z)·w + b + I(z; u, v)</span>
+            <span class="mf mf--2" aria-hidden="true">I(z; u, v) = (uᵀz)(vᵀz) − Σ uⱼvⱼzⱼ²</span>
+            <span class="mf mf--3" aria-hidden="true">S = 0.011700</span>
+            <span class="mf mf--4" aria-hidden="true">w* = (DᶜᵀDᶜ + nαI)⁻¹ Dᶜᵀrᶜ</span>
+          </div>
+
+          <div class="math-visual__bar">
+            <span class="math-visual__bar-label">Glow</span>
+            <label class="glow-control">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true">
+                <circle cx="8" cy="8" r="2.8"/>
+                <path d="M8 1.6v1.6M8 12.8v1.6M1.6 8h1.6M12.8 8h1.6M3.5 3.5l1.1 1.1M11.4 11.4l1.1 1.1M12.5 3.5l-1.1 1.1M4.6 11.4l-1.1 1.1"/>
+              </svg>
+              <input type="range" min="30" max="170" step="1" value="100" data-glow-range aria-label="调节画面光效亮度">
+              <output data-glow-value>100%</output>
+            </label>
+          </div>
+        </div>
+
+        <div class="showcase__body">
+          <div class="showcase__index">01 — 学术论文</div>
+          <a class="showcase__title" href="projects/gaussian-kan.html">交互式 Gaussian-KAN 的解析初始化与分离估计</a>
+          <p class="showcase__en">Analytic Initialization &amp; Separable Estimation for Interactive Gaussian-KAN</p>
+          <p class="showcase__desc">
+            在固定 661 参数函数上，比较联合训练、一次解析初始化与持续条件求解三条估计路径。
+            预测目标是电池未来容量保持率，输入特征完全一致——改变的只有估计流程本身。
+          </p>
+
+          <div class="showcase__metrics">
+            <div class="sc-metric">
+              <div class="sc-metric__value">0.033003</div>
+              <div class="sc-metric__label">NASA 测试 RMSE</div>
+            </div>
+            <div class="sc-metric">
+              <div class="sc-metric__value">−41.58%</div>
+              <div class="sc-metric__label">相对 JOINT</div>
+            </div>
+            <div class="sc-metric">
+              <div class="sc-metric__value">−51.2%</div>
+              <div class="sc-metric__label">Oxford 开发分数</div>
+            </div>
+          </div>
+
+          <div class="showcase__foot">
+            <div class="tags">
+              <span class="tag">Gaussian-KAN</span>
+              <span class="tag">变量投影</span>
+              <span class="tag">PyTorch</span>
+              <span class="tag">电池健康</span>
+            </div>
+            <a class="showcase__link" href="projects/gaussian-kan.html">
+              查看项目
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 项目二 -->
+      <article class="showcase showcase--flip reveal" data-spotlight>
+        <div class="showcase__media car-visual" data-spotlight>
+          <span class="showcase__badge">Fig. 02 · Research</span>
+          <a class="showcase__demo-link" href="demo/forecast.html">系统演示 →</a>
+
+          <div class="car-visual__stage">
+            <svg class="car-svg" viewBox="0 0 880 560" aria-hidden="true">
+              <defs>
+                <linearGradient id="carBody" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#9fb8d8" stop-opacity=".16"/>
+                  <stop offset=".65" stop-color="#9fb8d8" stop-opacity=".06"/>
+                  <stop offset="1" stop-color="#8bbfa3" stop-opacity=".07"/>
+                </linearGradient>
+                <linearGradient id="carGlass" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#bcd2ea" stop-opacity=".22"/>
+                  <stop offset="1" stop-color="#8bbfa3" stop-opacity=".06"/>
+                </linearGradient>
+                <radialGradient id="carGlow" cx="46%" cy="62%" r="52%">
+                  <stop offset="0" stop-color="#8bbfa3" stop-opacity=".15"/>
+                  <stop offset="1" stop-color="#8bbfa3" stop-opacity="0"/>
+                </radialGradient>
+                <radialGradient id="lampGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0" stop-color="#cfe4ff" stop-opacity=".9"/>
+                  <stop offset="1" stop-color="#cfe4ff" stop-opacity="0"/>
+                </radialGradient>
+                <filter id="carSoft" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="9"/>
+                </filter>
+                <filter id="carSoft2" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="3.5"/>
+                </filter>
+                <pattern id="carGrid" width="44" height="44" patternUnits="userSpaceOnUse">
+                  <path d="M44 0H0V44" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+                </pattern>
+              </defs>
+
+              <rect width="880" height="560" fill="#101413"/>
+              <rect width="880" height="560" fill="url(#carGrid)"/>
+              <rect width="880" height="560" fill="url(#carGlow)"/>
+
+              <line x1="60" y1="452" x2="820" y2="452" stroke="rgba(255,255,255,.10)"/>
+              <ellipse cx="437" cy="456" rx="330" ry="14" fill="rgba(0,0,0,.45)"/>
+
+              <g class="car">
+                <path class="part" data-part="body"
+                      d="M128 402 L128 372 C128 344 142 330 168 324 L268 304
+                         C292 256 352 230 424 228 C496 226 544 242 570 266
+                         C600 296 628 314 668 320 L716 326 C736 330 746 348 746 370
+                         L746 402 Z"
+                      fill="url(#carBody)" stroke="rgba(206,222,238,.55)" stroke-width="1.4" stroke-linejoin="round"/>
+
+                <path d="M282 300 C306 264 358 242 422 240 C486 238 528 252 556 274 L578 300 Z"
+                      fill="url(#carGlass)" stroke="rgba(206,222,238,.34)" stroke-width="1.2" stroke-linejoin="round"/>
+                <path d="M424 241 L424 300" stroke="rgba(206,222,238,.24)" stroke-width="1.1"/>
+                <path d="M500 246 L500 300" stroke="rgba(206,222,238,.16)" stroke-width="1"/>
+
+                <path d="M189 402 A56 56 0 0 1 301 402" fill="none" stroke="rgba(206,222,238,.35)" stroke-width="1.3"/>
+                <path d="M564 402 A56 56 0 0 1 676 402" fill="none" stroke="rgba(206,222,238,.35)" stroke-width="1.3"/>
+
+                <path d="M424 302 L424 394" stroke="rgba(206,222,238,.22)" stroke-width="1.1"/>
+                <path d="M524 302 L524 392" stroke="rgba(206,222,238,.2)" stroke-width="1.1"/>
+                <rect x="356" y="330" width="30" height="4" rx="2" fill="rgba(206,222,238,.35)"/>
+                <rect x="544" y="330" width="30" height="4" rx="2" fill="rgba(206,222,238,.3)"/>
+
+                <path d="M292 296 L282 288 L266 290 L263 298 Z" fill="rgba(206,222,238,.28)"/>
+
+                <g class="part" data-part="light">
+                  <ellipse cx="160" cy="348" rx="34" ry="20" fill="url(#lampGlow)" filter="url(#carSoft)"/>
+                  <path d="M138 342 L178 336 L184 348 L142 356 Z" fill="rgba(214,234,255,.9)"/>
+                </g>
+
+                <g class="part" data-part="charge">
+                  <circle cx="726" cy="356" r="10" fill="none" stroke="#8bbfa3" stroke-width="1.4" opacity=".9"/>
+                  <circle cx="726" cy="356" r="3.4" fill="#8bbfa3"/>
+                  <path d="M726 340v6M726 366v6" stroke="#8bbfa3" stroke-width="1.2" opacity=".55"/>
+                  <circle cx="726" cy="356" r="22" fill="none" stroke="#8bbfa3" stroke-width="1" opacity=".22"/>
+                </g>
+
+                <path d="M712 334 L744 338 L742 348 L710 344 Z" fill="rgba(232,160,110,.75)"/>
+
+                <g class="part" data-part="battery">
+                  <rect x="320" y="384" width="230" height="18" rx="5"
+                        fill="rgba(139,191,163,.2)" stroke="#8bbfa3" stroke-width="1.4"/>
+                  <path d="M348 386v14M376 386v14M404 386v14M432 386v14M460 386v14M488 386v14M516 386v14"
+                        stroke="rgba(139,191,163,.45)" stroke-width="1"/>
+                  <rect x="320" y="384" width="230" height="18" rx="5" fill="none"
+                        stroke="#8bbfa3" stroke-width="3" opacity=".25" filter="url(#carSoft2)"/>
+                </g>
+
+                <g class="part" data-part="wheel-front">
+                  <circle cx="245" cy="402" r="52" fill="#0a0e0d" stroke="rgba(206,222,238,.5)" stroke-width="1.6"/>
+                  <circle cx="245" cy="402" r="30" fill="none" stroke="rgba(206,222,238,.32)" stroke-width="1.2"/>
+                  <circle cx="245" cy="402" r="6" fill="rgba(206,222,238,.55)"/>
+                  <path d="M245 372v60M215 402h60M224 381l42 42M266 381l-42 42" stroke="rgba(206,222,238,.16)" stroke-width="1.2"/>
+                </g>
+
+                <g class="part" data-part="wheel-rear">
+                  <circle cx="620" cy="402" r="52" fill="#0a0e0d" stroke="rgba(206,222,238,.5)" stroke-width="1.6"/>
+                  <circle cx="620" cy="402" r="30" fill="none" stroke="rgba(206,222,238,.32)" stroke-width="1.2"/>
+                  <circle cx="620" cy="402" r="6" fill="rgba(206,222,238,.55)"/>
+                  <path d="M620 372v60M590 402h60M599 381l42 42M641 381l-42 42" stroke="rgba(206,222,238,.16)" stroke-width="1.2"/>
+                </g>
+
+                <path class="part" data-part="cabin"
+                      d="M282 300 C306 264 358 242 422 240 C486 238 528 252 556 274 L578 300 Z"
+                      fill="rgba(159,184,216,.06)" stroke="rgba(206,222,238,.2)" stroke-width="1"/>
+              </g>
+
+            </svg>
+
+            <a class="hotspot" style="--x:18.2%; --y:61.8%" href="projects/nev-policy.html#overview" data-part="light">
+              <span class="hotspot__dot">01</span>
+              <span class="hotspot__label">概览</span>
+            </a>
+            <a class="hotspot" style="--x:60.2%; --y:64.6%" href="projects/nev-policy.html#data" data-part="body">
+              <span class="hotspot__dot">02</span>
+              <span class="hotspot__label">数据资产</span>
+            </a>
+            <a class="hotspot" style="--x:27.8%; --y:71.8%" href="projects/nev-policy.html#method" data-part="wheel-front">
+              <span class="hotspot__dot">03</span>
+              <span class="hotspot__label">识别与核算</span>
+            </a>
+            <a class="hotspot" style="--x:70.5%; --y:71.8%" href="projects/nev-policy.html#results" data-part="wheel-rear">
+              <span class="hotspot__dot">04</span>
+              <span class="hotspot__label">结果</span>
+            </a>
+            <a class="hotspot" style="--x:50%; --y:70.7%" href="projects/nev-policy.html#welfare" data-part="battery">
+              <span class="hotspot__dot">05</span>
+              <span class="hotspot__label">福利核算</span>
+            </a>
+            <a class="hotspot" style="--x:48.9%; --y:47.9%" href="projects/nev-policy.html#system" data-part="cabin">
+              <span class="hotspot__dot">06</span>
+              <span class="hotspot__label">展示系统</span>
+            </a>
+
+          </div>
+
+          <div class="car-visual__bar">
+            <span class="car-visual__bar-label">Index</span>
+            <span class="car-visual__hint">点击车身部位 · 跳到对应章节</span>
+          </div>
+        </div>
+
+        <div class="showcase__body">
+          <div class="showcase__index">02 — 研究项目 + 系统</div>
+          <a class="showcase__title" href="projects/nev-policy.html">新能源汽车消费政策评估与福利核算</a>
+          <p class="showcase__en">Policy Effects and Welfare Accounting for New Energy Vehicle Consumption</p>
+          <p class="showcase__desc">
+            以 2021—2024 年 TOP50 热销车型的 48 个月面板为底，用双向固定效应、双重差分与事件研究
+            识别补贴退出和购置税上限的影响，再按同级别同价格带做反事实匹配，把销量换算成财政成本、
+            碳减排与用户节约。
+          </p>
+
+          <div class="showcase__metrics">
+            <div class="sc-metric">
+              <div class="sc-metric__value">2122.98<small style="font-size:.6em;color:var(--muted)"> 亿元</small></div>
+              <div class="sc-metric__label">四年财政成本</div>
+            </div>
+            <div class="sc-metric">
+              <div class="sc-metric__value">1174.02<small style="font-size:.6em;color:var(--muted)"> 万吨</small></div>
+              <div class="sc-metric__label">使用阶段减排</div>
+            </div>
+            <div class="sc-metric">
+              <div class="sc-metric__value">18082.94<small style="font-size:.6em;color:var(--muted)"> 元/吨</small></div>
+              <div class="sc-metric__label">每吨减排成本</div>
+            </div>
+          </div>
+
+          <div class="showcase__foot">
+            <div class="tags">
+              <span class="tag">面板计量</span>
+              <span class="tag">反事实模拟</span>
+              <span class="tag">福利核算</span>
+              <span class="tag">静态 Web</span>
+            </div>
+            <a class="showcase__link" href="projects/nev-policy.html">
+              查看项目
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       方法
+       ==================================================================== -->
+  <section class="section" id="approach">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <div class="kicker">Approach / 方法与工具</div>
+          <h2 class="h2">从口径到结论的四段工作</h2>
+        </div>
+        <p class="section-head__note">
+          数据治理、识别设计、模型实现与产品化，是一条链上的四段。任何一段含糊，结论都不可复核。
+        </p>
+      </div>
+
+      <div class="approach reveal">
+        <div class="approach__row">
+          <div class="approach__num">01</div>
+          <div class="approach__title">识别与归因<span>Identify</span></div>
+          <p class="approach__desc">双向固定效应、双重差分与事件研究：把政策节点前后的相对变化，与市场自身的增长分开。</p>
+        </div>
+        <div class="approach__row">
+          <div class="approach__num">02</div>
+          <div class="approach__title">反事实与核算<span>Counterfactual</span></div>
+          <p class="approach__desc">按同月份、同级别、同价格带匹配燃油或油混车型，把销量折成财政成本、减排量与用户使用成本。</p>
+        </div>
+        <div class="approach__row">
+          <div class="approach__num">03</div>
+          <div class="approach__title">可解释建模<span>Model</span></div>
+          <p class="approach__desc">Gaussian 基展开、轻量 KAN 与变量投影；用逐电池、逐配置的评价检验平均收益与局部退化。</p>
+        </div>
+        <div class="approach__row">
+          <div class="approach__num">04</div>
+          <div class="approach__title">交付与复现<span>Ship</span></div>
+          <p class="approach__desc">静态网页与 Streamlit 复现版：资源本地化、离线可跑、可直接部署到对象存储或内网。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       技能
+       ==================================================================== -->
+  <section class="section" id="skills">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <div class="kicker">Toolkit / 技能</div>
+          <h2 class="h2">用过、并且交付过的东西</h2>
+        </div>
+        <p class="section-head__note">只列在项目里真正用到的部分；需要时再学新的。</p>
+      </div>
+
+      <div class="skills reveal">
+        <div class="skills__label">编程</div>
+        <div class="skills__row">
+          <span class="chip">Python</span>
+          <span class="chip">PyTorch</span>
+          <span class="chip">NumPy</span>
+          <span class="chip">pandas</span>
+          <span class="chip">Matplotlib</span>
+          <span class="chip">HTML / CSS</span>
+          <span class="chip">JavaScript</span>
+          <span class="chip">Git</span>
+        </div>
+
+        <div class="skills__label">方法</div>
+        <div class="skills__row">
+          <span class="chip">双向固定效应</span>
+          <span class="chip">双重差分</span>
+          <span class="chip">事件研究</span>
+          <span class="chip">反事实匹配</span>
+          <span class="chip">变量投影</span>
+          <span class="chip">SVD 条件解</span>
+          <span class="chip">逐电池交叉验证</span>
+        </div>
+
+        <div class="skills__label">交付</div>
+        <div class="skills__row">
+          <span class="chip">Streamlit</span>
+          <span class="chip">静态站点</span>
+          <span class="chip">数据可视化</span>
+          <span class="chip">研究报告写作</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       关于
+       ==================================================================== -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="about reveal">
+        <div>
+          <div class="kicker">About / 关于</div>
+          <h2 class="h2">把问题问小，<br>把证据做实</h2>
+          <p class="about__quote">结论可以保守，但过程必须可复核。</p>
+        </div>
+
+        <div class="about__body">
+          <p>
+            我做的两类工作看起来不同，其实相通：一类预测电池的容量保持率，一类评估新能源汽车的消费政策。
+            前者要回答「同一个模型、同一份数据，换一种估计流程值不值」，后者要回答「财政支出换来的减排和
+            用户节约是否对得上」。两者都要求先把数据口径对齐，再选择与问题匹配的证据强度。
+          </p>
+          <p>
+            我倾向于把结论写清楚边界：哪些是显著结果，哪些只是方向；平均改善之外有没有局部退化；
+            一个条件最优解，在域外是否依然可靠。项目里的每张图、每个系数，都尽量能追溯到具体的样本口径与参数设定。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       联系
+       ==================================================================== -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="contact-v2 reveal">
+        <div class="kicker">Contact / 联系</div>
+
+        <h2 class="h2" style="margin-bottom:14px">聊聊研究、数据或系统</h2>
+        <p style="color:var(--muted);font-size:.94rem;line-height:1.95;max-width:40em">
+          简历、论文全文（投递中）、研究报告与系统演示都可以通过邮件获取。也欢迎就电池健康预测、
+          政策评估或数据系统设计交流。
+        </p>
+
+        <div class="contact-v2__email-row">
+          <a class="contact-v2__email" href="mailto:15517500717@163.com">15517500717@163.com</a>
+          <button class="copy-btn" type="button" id="copyEmail" data-email="15517500717@163.com" aria-live="polite">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 5.5v-2a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2"/></svg>
+            复制邮箱
+          </button>
+        </div>
+
+        <div class="contact-v2__links">
+          <a href="mailto:15517500717@163.com">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="2.5" y="4.5" width="11" height="7"/><path d="m2.5 5 5.5 4 5.5-4"/></svg>
+            写信给我
+          </a>
+          <a href="mailto:15517500717@163.com?subject=%E5%92%A8%E8%AF%A2%20Gaussian-KAN%20%E8%AE%BA%E6%96%87%E5%85%A8%E6%96%87">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 2.5h5l3 3v8H4z"/><path d="M9 2.5v3h3"/></svg>
+            论文全文（投递中，可邮件索取）
+          </a>
+          <a href="assets/docs/NEV_Policy_Welfare_Report.pdf" target="_blank" rel="noopener">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v7M5.5 7.5 8 10l2.5-2.5M3.5 12.5h9"/></svg>
+            研究报告（PDF）
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div>
+      <div style="font-weight:600;color:var(--ink);font-size:.92rem">刘问鼎</div>
+      <div style="margin-top:4px">© <span id="year">2026</span> · 能源、政策与数据研究</div>
+    </div>
+    <nav class="footer-nav" aria-label="页脚导航">
+      <a href="#work">项目</a>
+      <a href="#approach">方法</a>
+      <a href="#about">关于</a>
+      <a href="#contact">联系</a>
+    </nav>
+    <a class="to-top" href="#main">
+      回到顶部
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V3M4 7l4-4 4 4"/></svg>
+    </a>
+  </div>
+</footer>
+
+<script src="assets/js/main.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "刘问鼎",
+  "email": "15517500717@163.com",
+  "description": "能源、政策与数据研究：电池容量保持率预测与新能源汽车消费政策评估。",
+  "knowsAbout": ["Machine Learning", "Battery Health Forecasting", "Policy Evaluation", "Econometrics", "Data Visualization"]
+}
+</script>
+</body>
+</html>

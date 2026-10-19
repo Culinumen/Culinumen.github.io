@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>新能源汽车消费政策评估与福利核算 · 刘问鼎</title>
+<meta name="description" content="基于 2021—2024 年 TOP50 热销车型月度面板：补贴退出与购置税上限的效应识别，同级别同价格带的反事实匹配，以及财政成本、碳减排、用户使用成本与每吨减排成本的核算。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="新能源汽车消费政策评估与福利核算">
+<meta property="og:description" content="48 个月车型面板、双向固定效应与反事实福利核算，以及一个可离线运行的 Web 展示系统。">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/v2.css">
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('theme');
+      var system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = saved || system;
+      document.documentElement.classList.add('js');
+    } catch (e) { /* 忽略 */ }
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">跳到主要内容</a>
+<div class="progress" aria-hidden="true"></div>
+
+<header class="site-header" id="siteHeader">
+  <div class="site-header__inner">
+    <a class="brand" href="../index.html" aria-label="返回首页">
+      <span class="brand__mark" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+          <path d="M6 1v10M1 6h10M2.5 2.5l7 7M9.5 2.5l-7 7"/>
+        </svg>
+      </span>
+      <span>刘问鼎</span>
+      <span class="brand__en">Portfolio</span>
+    </a>
+
+    <div class="site-header__right">
+    <nav class="nav" id="primaryNav" aria-label="主导航">
+      <a href="../index.html">首页</a>
+      <a href="../index.html#work">项目</a>
+      <a href="../index.html#contact">联系</a>
+      </nav>
+
+      <button class="theme-toggle" type="button" id="themeToggle" aria-label="切换深色 / 浅色主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.5 14.2A8.6 8.6 0 1 1 9.8 3.5a7 7 0 0 0 10.7 10.7Z"/>
+        </svg>
+      </button>
+
+      <button class="nav-toggle" type="button" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="展开导航">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="page-hero">
+    <div class="container">
+      <a class="page-hero__back" href="../index.html#work">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 4 3 8l4 4"/></svg>
+        全部项目
+      </a>
+
+      <div class="kicker">Research &amp; System / 研究项目</div>
+
+      <h1 class="page-hero__title">新能源汽车消费政策评估与福利核算</h1>
+
+      <p class="page-hero__sub">
+        当补贴退出、免税额设上限，市场是否还站得住？财政成本换来的减排与用户节约，能不能对上？
+        <span class="page-hero__sub-en">Policy Effects and Welfare Accounting for New Energy Vehicle Consumption, 2021—2024</span>
+      </p>
+
+      <div class="meta-row">
+        <div class="meta-item">
+          <div class="meta-item__label">Period</div>
+          <div class="meta-item__value">2021.01 — 2024.12（48 个月）</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-item__label">Sample</div>
+          <div class="meta-item__value">TOP50 热销车型 · 车型—月份面板</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-item__label">Methods</div>
+          <div class="meta-item__value">双向固定效应 · DID · 事件研究 · 反事实匹配</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-item__label">Delivery</div>
+          <div class="meta-item__value">研究报告 + Web 展示系统 + Python 复现版</div>
+        </div>
+      </div>
+
+      <div class="hero__actions" style="margin-top:24px">
+        <a class="btn" href="../demo/forecast.html">
+          打开系统演示
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+        <a class="btn btn--ghost" href="../assets/docs/nev-forecast-system.zip" download>
+          下载源代码
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v7M5.5 7.5 8 10l2.5-2.5M3.5 12.5h9"/></svg>
+        </a>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric__value">2122.98<small>亿元</small></div>
+          <div class="metric__label">四年购置税减免财政成本（基准情景）</div>
+        </div>
+        <div class="metric">
+          <div class="metric__value">1174.02<small>万吨</small></div>
+          <div class="metric__label">使用阶段碳减排量</div>
+        </div>
+        <div class="metric">
+          <div class="metric__value">622.47<small>亿元</small></div>
+          <div class="metric__label">用户使用成本节约</div>
+        </div>
+        <div class="metric">
+          <div class="metric__value">18082.94<small>元/吨</small></div>
+          <div class="metric__label">每吨减排财政成本（四年综合）</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="detail-layout">
+
+      <aside class="toc" aria-label="页面目录">
+        <div class="toc__label">Contents</div>
+        <a href="#overview">概览</a>
+        <a href="#data">数据资产</a>
+        <a href="#method">识别与核算</a>
+        <a href="#results">结果</a>
+        <a href="#welfare">福利核算</a>
+        <a href="#system">展示系统</a>
+        <a href="#limits">边界</a>
+      </aside>
+
+      <div class="detail-body">
+
+        <!-- 概览 -->
+        <section class="detail-section reveal" id="overview">
+          <div class="detail-section__head">
+            <span class="detail-section__num">01</span>
+            <h2>概览：从「销量涨没涨」到「钱花得值不值」</h2>
+          </div>
+
+          <div class="prose">
+            <p>
+              2022 年底，国家新能源汽车购置补贴退出；2024 年起，新能源乘用车购置税免税额设置上限。
+              政策评价的问题随之变化：<strong>市场是否具备自驱能力，财政投入是否有效，减排收益是否匹配</strong>。
+              销量趋势本身回答不了这三个问题。
+            </p>
+            <p>
+              项目以 2021 年 1 月至 2024 年 12 月 TOP50 热销车型的月度销量为主线，把车型属性、动力类型、
+              官方指导价、乘用车市场总量、政策时间轴、电力碳排放因子、油电价格与年均行驶里程接入同一套
+              车型—月份面板，形成「政策—市场—车型—环境—福利」一体化的分析口径。
+            </p>
+            <p>
+              在这套口径上，识别与核算被串成一条链：先用固定效应、双重差分和事件研究判断政策节点前后的
+              相对变化，再用同月份、同级别、同价格带的燃油或油混车型做反事实匹配，把销量换算成财政成本、
+              碳减排量、用户使用成本与每吨减排财政成本。
+            </p>
+          </div>
+
+          <div class="stat-list">
+            <div class="stat-line">
+              <span class="stat-line__k">Q1 · 补贴退出</span>
+              <span class="stat-line__v">购置补贴退出后，主流新能源车型是否出现明显下滑？<b>未出现显著系统性变化。</b></span>
+            </div>
+            <div class="stat-line">
+              <span class="stat-line__k">Q2 · 税收上限</span>
+              <span class="stat-line__v">免税额上限是否影响不同价格带车型？<b>高价新能源车型未见显著负向冲击。</b></span>
+            </div>
+            <div class="stat-line">
+              <span class="stat-line__k">Q3 · 福利匹配</span>
+              <span class="stat-line__v">减排与使用成本节约能否匹配财政成本？<b>减排持续增长，但基准情景下财政成本明显更高。</b></span>
+            </div>
+          </div>
+
+          <div class="callout">
+            <div class="callout__title">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M8 7.2v4M8 4.9v.9"/></svg>
+              一句话结论
+            </div>
+            <p>
+              在 TOP50 主流车型口径下，市场已经具备一定的自驱动扩散能力；政策优化的方向不是简单取消支持，
+              而是从普惠式优惠转向更高替代强度、更高减排效率的精准支持。
+            </p>
+          </div>
+        </section>
+
+        <!-- 数据 -->
+        <section class="detail-section reveal" id="data">
+          <div class="detail-section__head">
+            <span class="detail-section__num">02</span>
+            <h2>数据资产与治理</h2>
+          </div>
+
+          <div class="prose">
+            <p>
+              难点不在数据量，而在口径。同一车系可能同时有燃油版、油混版、插混版、增程版与纯电版，
+              不同平台对车型名称与动力类型的标注也不一致。项目在面板构建前统一车型名称、厂商、动力类型与价格带，
+              形成<strong>厂商—车型联合识别口径</strong>，再把政策文件转成月份维度的结构化变量。
+            </p>
+            <p>
+              TOP50 样本在四年间的合计销量维持在 1030—1111 万辆，约占当年乘用车市场总量的 48%：
+              足以观察主流市场的竞争格局，但不代表全部车型市场。
+            </p>
+          </div>
+
+          <div class="timeline">
+            <div class="tl">
+              <div class="tl__date">2021.01</div>
+              <div class="tl__title">面板起点</div>
+              <div class="tl__desc">车型—月份口径建立，覆盖 TOP50 热销车型。</div>
+            </div>
+            <div class="tl">
+              <div class="tl__date">2022.12</div>
+              <div class="tl__title">购置补贴退出</div>
+              <div class="tl__desc">新能源车型与燃油/油混车型的 DID 识别节点。</div>
+            </div>
+            <div class="tl">
+              <div class="tl__date">2024.01</div>
+              <div class="tl__title">免税额设上限</div>
+              <div class="tl__desc">按官方指导价推算单车优惠，构建高价新能源车型交互项。</div>
+            </div>
+            <div class="tl">
+              <div class="tl__date">2024.12</div>
+              <div class="tl__title">面板终点</div>
+              <div class="tl__desc">以旧换新等政策同期成为扩大汽车消费的重要工具。</div>
+            </div>
+          </div>
+
+          <div class="prose">
+            <p>
+              福利核算覆盖进入反事实匹配的 641 条新能源车型月度记录，全部匹配到同月份、同级别、
+              同价格带的燃油或油混对象；若最高优先级集合为空，则按预设规则逐级放宽，避免大量样本被直接丢弃。
+            </p>
+          </div>
+        </section>
+
+        <!-- 方法 -->
+        <section class="detail-section reveal" id="method">
+          <div class="detail-section__head">
+            <span class="detail-section__num">03</span>
+            <h2>两部分方法：先识别，再核算</h2>
+          </div>
+
+          <div class="prose">
+            <p>
+              <strong>识别部分</strong>同时控制车型固定效应与月份固定效应：前者吸收品牌、定位、级别与基础产品力等稳定差异，
+              后者吸收季节性、宏观消费环境、行业价格战等共同时间冲击。识别依赖同一车型在不同月份的变化，
+              以及不同车型在同一政策节点前后的相对变化。
+            </p>
+            <p>
+              <strong>核算部分</strong>以「如果没有买新能源车，会买什么」为反事实问题。相比直接拿平均燃油车做基准，
+              同月份、同级别、同价格带的匹配更接近真实消费选择，避免把高价新能源 SUV 与低价小型燃油轿车放在一起比较。
+              在此基础上计算：
+            </p>
+            <ul>
+              <li>财政成本 = 单车购置税优惠金额 × 当月销量；</li>
+              <li>碳减排量 = （反事实车型单位公里排放 − 新能源车型单位公里排放）× 年均行驶里程 × 销量；</li>
+              <li>用户使用成本节约 = 单位公里油电成本差异 × 年均行驶里程 × 销量；</li>
+              <li>每吨减排财政成本 = 财政成本 ÷ 碳减排量，用于比较政策效率。</li>
+            </ul>
+            <p>
+              纯电车型的用电排放按年度电力碳排放因子计算，插混与增程按油电使用比例加权，不把新能源车直接视为零排放。
+            </p>
+          </div>
+
+          <div class="flow">
+            <div class="flow__row">
+              <span class="flow__tag">Step 1<small>口径</small></span>
+              <div class="flow__steps">
+                <span class="flow__step">车型标准化</span>
+                <span class="flow__step">动力类型识别</span>
+                <span class="flow__step">价格带划分</span>
+                <span class="flow__step">政策变量匹配</span>
+              </div>
+            </div>
+            <div class="flow__row">
+              <span class="flow__tag">Step 2<small>识别</small></span>
+              <div class="flow__steps">
+                <span class="flow__step">双向固定效应</span>
+                <span class="flow__step">DID</span>
+                <span class="flow__step">事件研究</span>
+              </div>
+            </div>
+            <div class="flow__row flow__row--hero">
+              <span class="flow__tag">Step 3<small>核算</small></span>
+              <div class="flow__steps">
+                <span class="flow__step">反事实匹配</span>
+                <span class="flow__step">成本 / 减排 / 节约</span>
+                <span class="flow__step">每吨减排成本</span>
+                <span class="flow__step">情景分析</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 结果 -->
+        <section class="detail-section reveal" id="results">
+          <div class="detail-section__head">
+            <span class="detail-section__num">04</span>
+            <h2>结果：结构在变，政策冲击不显著</h2>
+          </div>
+
+          <div class="prose">
+            <p>
+              四年间，新能源车型在 TOP50 样本中的销量由 121.17 万辆增至 566.40 万辆，占比从 11.8% 升到 51.5%。
+              扩散并不是单一路线：纯电仍是主力，插混与增程的增速更快，燃油与油混车型的份额则持续收窄。
+            </p>
+          </div>
+
+          <p class="table-caption">表：TOP50 样本内各动力类型年销量（万辆）</p>
+
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr><th>动力类型</th><th class="num">2021</th><th class="num">2024</th><th class="num">变化</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>纯电</td><td class="num">104.21</td><td class="num">279.85</td><td class="num">+175.64</td></tr>
+                <tr><td>插电式混合动力</td><td class="num">2.71</td><td class="num">141.37</td><td class="num">+138.66</td></tr>
+                <tr><td>增程式</td><td class="num">4.56</td><td class="num">58.94</td><td class="num">+54.38</td></tr>
+                <tr><td>燃油</td><td class="num">723.61</td><td class="num">411.02</td><td class="num">−312.59</td></tr>
+                <tr><td>油电混合</td><td class="num">170.55</td><td class="num">121.57</td><td class="num">−48.98</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-hint">左右滑动查看完整表格</p>
+
+          <div class="prose">
+            <p>
+              分价格带看，新能源的渗透已经覆盖从代步到中高端的全部区间。10 万元以下由 19.6% 升至 85.5%，
+              10—20 万元这个家庭购车最集中的区间从 4.2% 升到 49.7%，30 万元以上也从 4.0% 升到 36.0%。
+            </p>
+          </div>
+
+          <div class="chart">
+            <div class="chart__head">
+              <span class="chart__title">各价格带新能源汽车销量占比：2021 → 2024</span>
+              <span class="legend"><span><i class="is-from"></i>2021</span><span><i class="is-to"></i>2024</span></span>
+            </div>
+            <div class="dumbbell">
+              <div class="dumbbell__row">
+                <span class="dumbbell__label">10 万以下</span>
+                <div class="dumbbell__track">
+                  <span class="dumbbell__line" style="--from:19.6%;--to:85.5%"></span>
+                  <span class="dumbbell__dot dumbbell__dot--from" style="left:19.6%"></span>
+                  <span class="dumbbell__dot dumbbell__dot--to" style="left:85.5%"></span>
+                </div>
+                <span class="dumbbell__value">19.6% → <b>85.5%</b></span>
+              </div>
+              <div class="dumbbell__row">
+                <span class="dumbbell__label">10—20 万</span>
+                <div class="dumbbell__track">
+                  <span class="dumbbell__line" style="--from:4.2%;--to:49.7%"></span>
+                  <span class="dumbbell__dot dumbbell__dot--from" style="left:4.2%"></span>
+                  <span class="dumbbell__dot dumbbell__dot--to" style="left:49.7%"></span>
+                </div>
+                <span class="dumbbell__value">4.2% → <b>49.7%</b></span>
+              </div>
+              <div class="dumbbell__row">
+                <span class="dumbbell__label">20—30 万</span>
+                <div class="dumbbell__track">
+                  <span class="dumbbell__line" style="--from:22.0%;--to:43.9%"></span>
+                  <span class="dumbbell__dot dumbbell__dot--from" style="left:22.0%"></span>
+                  <span class="dumbbell__dot dumbbell__dot--to" style="left:43.9%"></span>
+                </div>
+                <span class="dumbbell__value">22.0% → <b>43.9%</b></span>
+              </div>
+              <div class="dumbbell__row">
+                <span class="dumbbell__label">30 万以上</span>
+                <div class="dumbbell__track">
+                  <span class="dumbbell__line" style="--from:4.0%;--to:36.0%"></span>
+                  <span class="dumbbell__dot dumbbell__dot--from" style="left:4.0%"></span>
+                  <span class="dumbbell__dot dumbbell__dot--to" style="left:36.0%"></span>
+                </div>
+                <span class="dumbbell__value">4.0% → <b>36.0%</b></span>
+              </div>
+            </div>
+            <div class="dumbbell__scale"><span><span>0%</span><span>50%</span><span>100%</span></span></div>
+            <p class="chart__note">价格带按车系官方指导价中位数划分；横轴为 0—100% 的占比区间。</p>
+          </div>
+
+          <div class="prose">
+            <p>
+              但结构变化不等于政策效果。三个模型给出的方向一致：政策优惠强度与销量正相关，补贴退出后新能源车型的相对变化为正，
+              税收上限对高价车型的相对影响也为正——<strong>三者都不显著</strong>。在主流热销车型里，2023 年的补贴退出
+              没有造成系统性失速，2024 年的免税额上限也没有让高价新能源车型明显掉队。
+            </p>
+          </div>
+
+          <p class="table-caption">表：政策效应识别结果（被解释变量为对数销量；市场份额口径结论一致）</p>
+
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr><th>模型</th><th>核心变量</th><th class="num">系数</th><th class="num">p 值</th><th>判断</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>双向固定效应</td><td>政策优惠比例</td>
+                  <td class="num">1.1755</td><td class="num">0.4795</td>
+                  <td>方向为正，不显著</td>
+                </tr>
+                <tr>
+                  <td>双重差分</td><td>新能源 × 2023 年起</td>
+                  <td class="num">0.0655</td><td class="num">0.5990</td>
+                  <td>无显著系统性下滑</td>
+                </tr>
+                <tr>
+                  <td>双重差分</td><td>高价新能源 × 2024 年起</td>
+                  <td class="num">0.0182</td><td class="num">0.8275</td>
+                  <td>无显著负向冲击</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-hint">左右滑动查看完整表格</p>
+
+          <div class="callout">
+            <div class="callout__title">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.4 14 13H2L8 2.4Z"/><path d="M8 6.6v3M8 11.4v.8"/></svg>
+              怎么解释「不显著」
+            </div>
+            <p>
+              不显著不等于政策无效。更合理的解释是：政策退出时，产品供给、价格竞争和消费者认知已经改善，
+              政策退坡的影响被市场内生增长部分抵消。事件研究显示政策节点前后系数波动较小，没有断崖式下行，
+              与 DID 结果一致。反过来，也不能把新能源的增长全部归因于政策优惠。
+            </p>
+          </div>
+        </section>
+
+        <!-- 福利 -->
+        <section class="detail-section reveal" id="welfare">
+          <div class="detail-section__head">
+            <span class="detail-section__num">05</span>
+            <h2>福利核算：收益在涨，成本更高</h2>
+          </div>
+
+          <div class="prose">
+            <p>
+              财政成本从 2021 年的 186.95 亿元增至 2024 年的 823.64 亿元，主因不是单车优惠变高，而是新能源销量规模快速扩张。
+              同期使用阶段碳减排由 103.74 万吨增至 454.27 万吨，四年合计 1174.02 万吨。
+            </p>
+            <p>
+              把用户节约与碳减排收益折成货币后，基准情景的预算调整净效益为 −1465.29 亿元。也就是说，
+              <strong>在基准参数下，直接量化的收益仍不足以覆盖购置税减免的财政成本</strong>。
+              这一结果对行驶里程、油电价格、碳价值与油电使用比例敏感，因此项目同时给出三类情景。
+            </p>
+          </div>
+
+          <p class="table-caption">表：情景分析（财政成本 / 碳减排收益 / 净效益单位：亿元；减排量单位：万吨）</p>
+
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>情景</th>
+                  <th class="num">财政成本</th>
+                  <th class="num">碳减排量</th>
+                  <th class="num">用户节约</th>
+                  <th class="num">减排收益</th>
+                  <th class="num">净效益</th>
+                  <th class="num">元/吨</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>保守</td><td class="num">2122.98</td><td class="num">903.09</td><td class="num">478.82</td>
+                  <td class="num">9.03</td><td class="num">−1635.12</td><td class="num">23507.82</td>
+                </tr>
+                <tr class="hl">
+                  <td>基准</td><td class="num">2122.98</td><td class="num">1174.02</td><td class="num">622.47</td>
+                  <td class="num">35.22</td><td class="num">−1465.29</td><td class="num">18082.94</td>
+                </tr>
+                <tr>
+                  <td>乐观</td><td class="num">2122.98</td><td class="num">1219.18</td><td class="num">646.41</td>
+                  <td class="num">60.96</td><td class="num">−1415.61</td><td class="num">17413.20</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-hint">左右滑动查看完整表格</p>
+
+          <div class="findings">
+            <div class="finding">
+              <div class="finding__k">效率</div>
+              <div class="finding__t">每吨减排成本约 1.8 万元</div>
+              <div class="finding__d">四年综合 18082.94 元/吨，2021—2024 各年在 17389—18580 元/吨之间，波动不大。</div>
+            </div>
+            <div class="finding">
+              <div class="finding__k">收益</div>
+              <div class="finding__t">减排与节约都在增长</div>
+              <div class="finding__d">减排量四年增长约 3.4 倍；用户使用成本节约四年合计 622.47 亿元。</div>
+            </div>
+            <div class="finding">
+              <div class="finding__k">含义</div>
+              <div class="finding__t">从普惠转向精准</div>
+              <div class="finding__d">优先支持高燃油车替代强度、高使用频率、低渗透区域与充电短板场景；以旧换新应关注「替代谁」。</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 系统 -->
+        <section class="detail-section reveal" id="system">
+          <div class="detail-section__head">
+            <span class="detail-section__num">06</span>
+            <h2>成果形态：一个能离线运行的展示系统</h2>
+          </div>
+
+          <div class="prose">
+            <p>
+              研究结论如果只停留在报告里，价值是一次性的。项目因此把数据、模型与核算结果组织成一套按
+              「数据层—治理层—模型层—应用层」分层的展示系统：数据层接入销量、车型、价格、政策、能源与环境参数；
+              治理层完成标准化、识别、匹配与校验；模型层承接识别与福利核算；应用层按政策评估的阅读顺序组织页面。
+            </p>
+          </div>
+
+          <div class="layers">
+            <div class="layer">
+              <span class="layer__name">Data</span>
+              <span>车型月度销量 · 车型属性 · 官方指导价 · 市场总量 · 政策时间轴 · 碳排放因子 · 油电价格</span>
+            </div>
+            <div class="layer">
+              <span class="layer__name">Governance</span>
+              <span><b>标准化与主键</b>：车型名称统一、厂商—车型联合识别、动力类型校验、缺失与不适用字段分开处理</span>
+            </div>
+            <div class="layer">
+              <span class="layer__name">Model</span>
+              <span><b>识别与核算</b>：双向固定效应、DID、事件研究、反事实匹配、福利与情景核算</span>
+            </div>
+            <div class="layer">
+              <span class="layer__name">App</span>
+              <span><b>页面</b>：首页总览 · 市场结构 · 政策时间轴与效应 · 福利核算 · 情景模拟 · 系统说明</span>
+            </div>
+          </div>
+
+          <div class="prose">
+            <p>
+              系统有两个版本。Web 展示版为静态网页，页面资源本地化，<strong>不依赖外部 CDN、数据库或后端服务</strong>，
+              可直接用浏览器打开，也可部署到内网或对象存储静态站点；Python 复现版基于 Streamlit，
+              用于展示数据读取、指标计算、图表生成与情景模拟流程。前者强调访问与演示，后者强调计算过程透明。
+            </p>
+          </div>
+
+          <div class="stat-list">
+            <div class="stat-line">
+              <span class="stat-line__k">Web 展示版</span>
+              <span class="stat-line__v">静态页面，离线可用；面向评审、答辩与政策试算场景。</span>
+            </div>
+            <div class="stat-line">
+              <span class="stat-line__k">Python 复现版</span>
+              <span class="stat-line__v">Streamlit 应用，覆盖读取、指标、图表与情景模拟的完整链路。</span>
+            </div>
+            <div class="stat-line">
+              <span class="stat-line__k">研究报告</span>
+              <span class="stat-line__v">十章节完整说明：数据治理、指标体系、识别结果、福利核算、系统设计、边界与迭代。</span>
+            </div>
+          </div>
+
+          <div class="prose">
+            <p>
+              完整研究报告可<a href="../assets/docs/NEV_Policy_Welfare_Report.pdf" target="_blank" rel="noopener">在线阅读（PDF）</a>；
+              销量预测系统提供<a href="../demo/forecast.html">静态演示</a>，源代码可<a href="../assets/docs/nev-forecast-system.zip" download>打包下载</a>。
+            </p>
+          </div>
+        </section>
+
+        <!-- 边界 -->
+        <section class="detail-section reveal" id="limits">
+          <div class="detail-section__head">
+            <span class="detail-section__num">07</span>
+            <h2>结论成立的条件</h2>
+          </div>
+
+          <div class="prose">
+            <ul>
+              <li>
+                <strong>样本口径。</strong>结论限定在 TOP50 主流热销车型：低销量、小众与区域性车型未被完整覆盖，
+                因此适合描述主流竞争格局，不代表全部乘用车市场。
+              </li>
+              <li>
+                <strong>个体选择的不可观测。</strong>车型月度数据能识别车型层面的相对变化，
+                但看不到「某个消费者是否因为政策优惠而改变选择」。接入调查、订单或登记数据才能提高替代识别的精度。
+              </li>
+              <li>
+                <strong>同期干扰。</strong>降价、渠道促销、供应链改善、智能化配置与充电基础设施变化都与政策节点同时发生；
+                固定效应与 DID 只能控制其中一部分。
+              </li>
+              <li>
+                <strong>福利参数敏感。</strong>净效益受碳价值、行驶里程、油电价格与插混油电使用比例影响，
+                所以用保守 / 基准 / 乐观三情景呈现，而非给出单一结果。
+              </li>
+            </ul>
+          </div>
+
+          <div class="callout">
+            <div class="callout__title">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M8 7.2v4M8 4.9v.9"/></svg>
+              下一步
+            </div>
+            <p>
+              接入省市销量、地方政策、充电桩密度与真实行驶数据后，同一套框架可以从全国主流车型样本，
+              扩展为区域政策评估与试算工具。
+            </p>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <nav class="pager" aria-label="项目导航">
+    <a href="gaussian-kan.html">
+      <span class="pager__label">← Previous · 01</span>
+      <span class="pager__title">交互式 Gaussian-KAN 的解析初始化与分离估计</span>
+    </a>
+    <a href="../index.html#work" style="text-align:right">
+      <span class="pager__label">Index</span>
+      <span class="pager__title">返回全部项目 →</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <span>© <span id="year">2026</span> 刘问鼎 · 静态页面，无外部依赖与追踪脚本</span>
+    <a class="to-top" href="#main">
+      回到顶部
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V3M4 7l4-4 4 4"/></svg>
+    </a>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js" defer></script>
+</body>
+</html>

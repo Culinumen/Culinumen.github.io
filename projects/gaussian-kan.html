@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light" data-accent="indigo">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>交互式 Gaussian-KAN 的解析初始化与分离估计 · 刘问鼎</title>
+<meta name="description" content="在固定 661 参数函数下比较 JOINT、WARMSTART 与 PROFILE 三条估计路径：Oxford、NASA、SDU 三个锂离子电池数据集上的容量保持率预测。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="交互式 Gaussian-KAN 的解析初始化与分离估计">
+<meta property="og:description" content="锂离子电池未来容量保持率预测：估计流程本身如何改变预测结果。">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/v2.css">
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('theme');
+      var system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = saved || system;
+      document.documentElement.classList.add('js');
+    } catch (e) { /* 忽略 */ }
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">跳到主要内容</a>
+<div class="progress" aria-hidden="true"></div>
+
+<header class="site-header" id="siteHeader">
+  <div class="site-header__inner">
+    <a class="brand" href="../index.html" aria-label="返回首页">
+      <span class="brand__mark" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+          <path d="M6 1v10M1 6h10M2.5 2.5l7 7M9.5 2.5l-7 7"/>
+        </svg>
+      </span>
+      <span>刘问鼎</span>
+      <span class="brand__en">Portfolio</span>
+    </a>
+
+    <div class="site-header__right">
+    <nav class="nav" id="primaryNav" aria-label="主导航">
+      <a href="../index.html">首页</a>
+      <a href="../index.html#work">项目</a>
+      <a href="../index.html#contact">联系</a>
+      </nav>
+
+      <button class="theme-toggle" type="button" id="themeToggle" aria-label="切换深色 / 浅色主题">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.5 14.2A8.6 8.6 0 1 1 9.8 3.5a7 7 0 0 0 10.7 10.7Z"/>
+        </svg>
+      </button>
+
+      <button class="nav-toggle" type="button" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="展开导航">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="page-hero">
+    <div class="container">
+      <a class="page-hero__back" href="../index.html#work">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 4 3 8l4 4"/></svg>
+        全部项目
+      </a>
+
+      <div class="kicker">Manuscript / 学术论文</div>
+
+      <h1 class="page-hero__title">交互式 Gaussian-KAN 的解析初始化与分离估计</h1>
+
+      <p class="page-hero__sub">
+        锂离子电池未来容量保持率预测：在同一个 661 参数函数上，只改变参数估计流程。
+        <span class="page-hero__sub-en">Analytic Initialization and Separable Estimation for Interactive Gaussian-KAN</span>
+      </p>
+
+      <div class="meta-row">
+        <div class="meta-item">
+          <div class="meta-item__label">Year</div>
+          <div class="meta-item__value">2026</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-item__label">Type</div>
+          <div class="meta-item__value">研究手稿 · 投递中 · 25 页</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-item__label">Datasets</div>
+          <div class="meta-item__value">Oxford · NASA · SDU（+ NA-ion 探索）</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-item__label">Stack</div>
+          <div class="meta-item__value">PyTorch · 缓存 SVD · float64</div>
+        </div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric__value">0.033003</div>
+          <div class="metric__label">NASA 测试电池等权 RMSE</div>
+        </div>
+        <div class="metric">
+          <div class="metric__value">−41.58<small>%</small></div>
+          <div class="metric__label">相对 JOINT 的误差降幅</div>
+        </div>
+        <div class="metric">
+          <div class="metric__value">0.022633</div>
+          <div class="metric__label">SDU 测试 RMSE（19 块电池）</div>
+        </div>
+        <div class="metric">
+          <div class="metric__value">661</div>
+          <div class="metric__label">模型参数：541 条件线性 + 120 交互</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="detail-layout">
+
+      <aside class="toc" aria-label="页面目录">
+        <div class="toc__label">Contents</div>
+        <a href="#overview">概览</a>
+        <a href="#question">问题</a>
+        <a href="#method">方法</a>
+        <a href="#results">结果</a>
+        <a href="#limits">边界</a>
+        <a href="#work">完成内容</a>
+      </aside>
+
+      <div class="detail-body">
+
+        <!-- 概览 -->
+        <section class="detail-section reveal" id="overview">
+          <div class="detail-section__head">
+            <span class="detail-section__num">01</span>
+            <h2>概览</h2>
+          </div>
+
+          <div class="prose">
+            <p>
+              电池数量有限、工况各不相同，预测未来容量保持率并不只是「换一个更强的模型」的问题。
+              本文固定函数类、损失函数与停止规则，只改变参数估计流程，检验<strong>估计路径本身</strong>能否带来可重复的预测改善。
+            </p>
+            <p>
+              三条路径共享同一个 661 参数函数：<span class="mono">JOINT</span> 用 Adam 联合更新全部参数；
+              <span class="mono">WARMSTART</span> 先做一次解析条件求解，再联合训练；
+              <span class="mono">PROFILE</span> 在每轮迭代中持续把线性参数块写回条件最优解，只对外层交互参数做梯度更新。
+              由于输入信息、标签定义与数据划分完全一致，三者之间的差异只能来自估计过程。
+            </p>
+          </div>
+
+          <div class="callout">
+            <div class="callout__title">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M8 7.2v4M8 4.9v.9"/></svg>
+              阅读方式
+            </div>
+            <p>
+              本文不主张 Gaussian-KAN 本身更优，而是把「初始化」「条件求解」与「验证集选择」拆开，
+              看它们各自贡献了什么、又在哪些数据域失效。因此结论以逐电池、逐配置的配对比较为主，
+              而不是只报一个平均分。
+            </p>
+          </div>
+        </section>
+
+        <!-- 问题 -->
+        <section class="detail-section reveal" id="question">
+          <div class="detail-section__head">
+            <span class="detail-section__num">02</span>
+            <h2>三个问题</h2>
+          </div>
+
+          <div class="prose">
+            <ol>
+              <li>在相同的训练预算与停止规则下，估计流程的变化是否足以改变预测误差？</li>
+              <li>如果改变，增量来自一次解析初始化，还是来自迭代过程中的持续条件求解？</li>
+              <li>这种收益能否跨数据集、跨电池保持，还是只在开发集上成立？</li>
+            </ol>
+            <p>
+              问题 2 需要用 <span class="mono">WARMSTART</span> 作为中间对照才能区分：<span class="mono">JOINT</span>
+              与 <span class="mono">PROFILE</span> 的比较同时改变了两件事——是否解析初始化，以及是否持续约束条件最优。
+            </p>
+          </div>
+        </section>
+
+        <!-- 方法 -->
+        <section class="detail-section reveal" id="method">
+          <div class="detail-section__head">
+            <span class="detail-section__num">03</span>
+            <h2>方法：固定的函数，变动的估计</h2>
+          </div>
+
+          <div class="prose">
+            <p>
+              输入是重采样后的历史电压、电流与温度曲线统计量：4 个历史分支 × 3 条曲线 × 5 个统计量，得到 60 维特征。
+              每个标准化坐标配 8 个等距 Gaussian 基中心（σ = 0.8，名义范围 [−3, 3]），设计向量由 60 个线性坐标与
+              480 个基值拼接而成。模型由加性主效应、去对角二次交互与不惩罚截距组成：
+            </p>
+          </div>
+
+          <div class="formula">
+            <span class="formula__label">Model</span>
+            F(z) = D(z)·w + b + I(z; u, v)<br>
+            I(z; u, v) = (uᵀz)(vᵀz) − Σ<sub>j</sub> u<sub>j</sub>v<sub>j</sub>z<sub>j</sub>²
+          </div>
+
+          <div class="prose">
+            <p>
+              固定交互参数 u、v 后，线性块的条件解是一个带二次惩罚的严格凸子问题。实现上对去中心化的设计矩阵
+              只做一次 float64 薄 SVD，并缓存线性映射，因此每轮条件求解的代价是 O(np)，而不需要重复分解：
+            </p>
+          </div>
+
+          <div class="formula">
+            <span class="formula__label">Conditional solve</span>
+            w* = (D<sub>c</sub>ᵀD<sub>c</sub> + nαI)<sup>−1</sup> D<sub>c</sub>ᵀr<sub>c</sub>，&nbsp; b*&nbsp;=&nbsp;r̄&nbsp;−&nbsp;D̄w*<br>
+            <span style="font-size:.86em;color:var(--muted)">α = 0.001，交互参数惩罚 β = 0.0001；分母 λ² + nα 恒正，零奇异值对应滤波系数为零。</span>
+          </div>
+
+          <div class="flow" aria-label="三种估计路径对比">
+            <div class="flow__row">
+              <span class="flow__tag">JOINT<small>联合梯度训练</small></span>
+              <div class="flow__steps">
+                <span class="flow__step">共同初始化</span>
+                <span class="flow__step">Adam 更新 w, b, u, v</span>
+                <span class="flow__step">验证集选 checkpoint</span>
+              </div>
+            </div>
+            <div class="flow__row">
+              <span class="flow__tag">WARMSTART<small>一次解析初始化</small></span>
+              <div class="flow__steps">
+                <span class="flow__step">条件求解 w, b</span>
+                <span class="flow__step">以解为初值联合训练</span>
+                <span class="flow__step">验证集选 checkpoint</span>
+              </div>
+            </div>
+            <div class="flow__row flow__row--hero">
+              <span class="flow__tag">PROFILE<small>持续条件求解</small></span>
+              <div class="flow__steps">
+                <span class="flow__step">每轮按当前 u, v 求条件解</span>
+                <span class="flow__step">对 u, v 做 Adam 更新</span>
+                <span class="flow__step">写回条件解 · 复用缓存映射</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="prose">
+            <p>
+              三个数据域分别按物理电池隔离：Oxford 用于方法开发与估计策略比较（8 块电池，H = 100 循环），
+              NASA 与 SDU 用于固定方案的留出评价（4 块测试电池 / 468 个目标；19 块测试电池 / 501 个目标）。
+              参数在各域训练集上重新估计，不做零样本迁移。
+            </p>
+          </div>
+        </section>
+
+        <!-- 结果 -->
+        <section class="detail-section reveal" id="results">
+          <div class="detail-section__head">
+            <span class="detail-section__num">04</span>
+            <h2>结果</h2>
+          </div>
+
+          <div class="prose">
+            <p>
+              Oxford 开发集上，三条路径的主分数依次为 0.023988、0.011984 与 0.011700。
+              仅改变估计流程，开发误差就下降了约一半；其中 <span class="mono">WARMSTART</span> 一次解析初始化
+              已经取得 50.04% 的降幅，<span class="mono">PROFILE</span> 在此基础上再降 2.37%。
+            </p>
+          </div>
+
+          <div class="chart">
+            <div class="chart__head">
+              <span class="chart__title">Oxford 开发主分数 S</span>
+              <span class="chart__unit">lower is better</span>
+            </div>
+            <div class="chart__cols" style="grid-template-columns:1fr">
+              <div>
+                <div class="bar-row">
+                  <span class="bar-row__label">JOINT</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:100%"></span></span>
+                  <span class="bar-row__value">0.023988</span>
+                </div>
+                <div class="bar-row">
+                  <span class="bar-row__label">WARMSTART</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:50.0%"></span></span>
+                  <span class="bar-row__value">0.011984</span>
+                </div>
+                <div class="bar-row bar-row--hero">
+                  <span class="bar-row__label">PROFILE</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:48.8%"></span></span>
+                  <span class="bar-row__value">0.011700</span>
+                </div>
+              </div>
+            </div>
+            <p class="chart__note">
+              主分数为电池等权的标准化误差，越低越好。差额比 (S<sub>JOINT</sub> − S<sub>WARMSTART</sub>) /
+              (S<sub>JOINT</sub> − S<sub>PROFILE</sub>) = 97.69%，表示一次解析初始化拿到了大部分可观察的改善——
+              但这是估计流程之间的代数比较，不是初始化的因果贡献率，因为 WARMSTART 同时包含后续训练与验证集选择。
+            </p>
+          </div>
+
+          <div class="prose">
+            <p>
+              跨数据域的固定方案评价给出了不同的图景。NASA 上持续条件求解的增量最大：
+              <span class="mono">PROFILE</span> 的测试电池等权 RMSE 为 0.033003，相对 <span class="mono">JOINT</span>
+              降低 41.58%，并且在全部 4 块测试电池上都有改善。SDU 的 19 块测试电池上，
+              <span class="mono">PROFILE</span> 的宏 RMSE 为 0.022633，相对 <span class="mono">JOINT</span> 降低 57.40%。
+            </p>
+          </div>
+
+          <div class="chart">
+            <div class="chart__head">
+              <span class="chart__title">测试电池等权宏 RMSE（固定留出方案）</span>
+              <span class="chart__unit">lower is better</span>
+            </div>
+            <div class="chart__cols">
+              <div>
+                <div class="chart-col__title">NASA<span>4 cells</span></div>
+                <div class="bar-row">
+                  <span class="bar-row__label">JOINT</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:100%"></span></span>
+                  <span class="bar-row__value">0.056488</span>
+                </div>
+                <div class="bar-row">
+                  <span class="bar-row__label">WARMSTART</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:74.8%"></span></span>
+                  <span class="bar-row__value">0.042279</span>
+                </div>
+                <div class="bar-row bar-row--hero">
+                  <span class="bar-row__label">PROFILE</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:58.4%"></span></span>
+                  <span class="bar-row__value">0.033003</span>
+                </div>
+                <div class="bar-row">
+                  <span class="bar-row__label">Ridge</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:59.1%"></span></span>
+                  <span class="bar-row__value">0.033360</span>
+                </div>
+                <div class="bar-row">
+                  <span class="bar-row__label">MLP</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:72.3%"></span></span>
+                  <span class="bar-row__value">0.040855</span>
+                </div>
+              </div>
+
+              <div>
+                <div class="chart-col__title">SDU<span>19 cells</span></div>
+                <div class="bar-row">
+                  <span class="bar-row__label">JOINT</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:100%"></span></span>
+                  <span class="bar-row__value">0.053133</span>
+                </div>
+                <div class="bar-row">
+                  <span class="bar-row__label">WARMSTART</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:43.6%"></span></span>
+                  <span class="bar-row__value">0.023156</span>
+                </div>
+                <div class="bar-row bar-row--hero">
+                  <span class="bar-row__label">PROFILE</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:42.6%"></span></span>
+                  <span class="bar-row__value">0.022633</span>
+                </div>
+                <div class="bar-row">
+                  <span class="bar-row__label">Ridge</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:69.0%"></span></span>
+                  <span class="bar-row__value">0.036655</span>
+                </div>
+                <div class="bar-row">
+                  <span class="bar-row__label">MLP</span>
+                  <span class="bar-row__track"><span class="bar-row__fill" style="--v:96.6%"></span></span>
+                  <span class="bar-row__value">0.051300</span>
+                </div>
+              </div>
+            </div>
+            <p class="chart__note">
+              条长按各数据域内的最大值归一，两个数据域分别解释，不合并成一个总分。
+              Ridge 的 α 固定为 1 且未在训练域内选择，MLP 也未做广泛配置搜索——这些比较代表固定预算下的方案，而非各函数类的上界。
+            </p>
+          </div>
+
+          <p class="table-caption">表：NASA 与 SDU 固定留出评价（宏平均为电池等权）</p>
+
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>数据域</th>
+                  <th>方法</th>
+                  <th class="num">宏 RMSE</th>
+                  <th class="num">宏 MAE</th>
+                  <th class="num">pooled RMSE</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td rowspan="4">NASA</td><td>JOINT</td><td class="num">0.056488</td><td class="num">0.050691</td><td class="num">0.063529</td></tr>
+                <tr><td>WARMSTART</td><td class="num">0.042279</td><td class="num">0.036366</td><td class="num">0.047197</td></tr>
+                <tr class="hl"><td>PROFILE</td><td class="num">0.033003</td><td class="num">0.028960</td><td class="num">0.034293</td></tr>
+                <tr><td>固定 Ridge α=1</td><td class="num">0.033360</td><td class="num">0.028772</td><td class="num">0.036366</td></tr>
+                <tr><td rowspan="4">SDU</td><td>JOINT</td><td class="num">0.053133</td><td class="num">0.049516</td><td class="num">0.030302</td></tr>
+                <tr><td>WARMSTART</td><td class="num">0.023156</td><td class="num">0.021446</td><td class="num">0.017209</td></tr>
+                <tr class="hl"><td>PROFILE</td><td class="num">0.022633</td><td class="num">0.020653</td><td class="num">0.017463</td></tr>
+                <tr><td>固定 Ridge α=1</td><td class="num">0.036655</td><td class="num">0.032098</td><td class="num">0.029907</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-hint">左右滑动查看完整表格</p>
+
+          <div class="findings">
+            <div class="finding">
+              <div class="finding__k">Oxford</div>
+              <div class="finding__t">初始化拿走大部分改善</div>
+              <div class="finding__d">WARMSTART 相对 JOINT 降低 50.04%，PROFILE 再降 2.37%；差额比 97.69%。</div>
+            </div>
+            <div class="finding">
+              <div class="finding__k">NASA</div>
+              <div class="finding__t">持续求解的增量最大</div>
+              <div class="finding__d">PROFILE 相对 JOINT 降低 41.58%，4 块测试电池全部改善；但相对 Ridge 仅低 1.07%（2 好 2 差）。</div>
+            </div>
+            <div class="finding">
+              <div class="finding__k">SDU</div>
+              <div class="finding__t">主指标与多数电池不一致</div>
+              <div class="finding__d">PROFILE 宏 RMSE 最低，但 WARMSTART 在 19 块电池中的 13 块更好，pooled RMSE 也更低。</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 边界 -->
+        <section class="detail-section reveal" id="limits">
+          <div class="detail-section__head">
+            <span class="detail-section__num">05</span>
+            <h2>结论与边界</h2>
+          </div>
+
+          <div class="prose">
+            <p>
+              这些结果支持的判断是：在明确的训练预算与停止规则下，<strong>估计路径是影响预测结果的重要因素</strong>，
+              而且它的收益随数据域与电池而变化。它们不支持「该方法对任意电池、任务或化学体系普遍更优」。
+            </p>
+            <ul>
+              <li>
+                <strong>条件最优不等于跨域可靠。</strong>NA-ion 探索性评价中，PROFILE 的宏 RMSE 为 0.129883，
+                最差电池达到 1.424789——异常输出主要来自二次交互分支，而对应输入已远离训练分布。
+              </li>
+              <li>
+                <strong>平均收益不等于多数电池更好。</strong>Oxford 的 8 个配置—电池项中 PROFILE 只有 5 项改善；
+                相对线性交互对照组也只有 3 项改善、5 项退化。
+              </li>
+              <li>
+                <strong>结构归因受模型规模约束。</strong>Gaussian 版本比线性交互控制多 480 个可拟合系数，
+                因此不能把差异完全归给表示本身。
+              </li>
+              <li>
+                <strong>排名限定在共同停止预算内。</strong>NASA 的 JOINT 有 4 次、SDU 有 3 次训练触及 180 轮上限，
+                不能据此认定它们充分优化后仍然更差。
+              </li>
+            </ul>
+          </div>
+
+          <div class="callout">
+            <div class="callout__title">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.4 14 13H2L8 2.4Z"/><path d="M8 6.6v3M8 11.4v.8"/></svg>
+              最有价值的一条
+            </div>
+            <p>
+              正则化条件解的数值残差（PROFILE 约 10⁻¹² 量级）只能说明子问题被准确求解，
+              不能替代跨电池、跨数据域的可靠性验证。两类证据要一起报。
+            </p>
+          </div>
+        </section>
+
+        <!-- 完成内容 -->
+        <section class="detail-section reveal" id="work">
+          <div class="detail-section__head">
+            <span class="detail-section__num">06</span>
+            <h2>完成内容</h2>
+          </div>
+
+          <div class="stat-list">
+            <div class="stat-line">
+              <span class="stat-line__k">Data</span>
+              <span class="stat-line__v">三个数据域的窗口构造、重采样与历史统计特征；标签定义、参考容量与评价层级分别固化。</span>
+            </div>
+            <div class="stat-line">
+              <span class="stat-line__k">Implementation</span>
+              <span class="stat-line__v">三种估计流程与缓存 SVD 的条件求解；逐次训练记录、停止原因、计时与峰值显存。</span>
+            </div>
+            <div class="stat-line">
+              <span class="stat-line__k">Evaluation</span>
+              <span class="stat-line__v">逐电池等权宏平均与 pooled 指标并用，配合逐项配对比较，区分平均收益与局部退化。</span>
+            </div>
+            <div class="stat-line">
+              <span class="stat-line__k">Writing</span>
+              <span class="stat-line__v">完整手稿（含图表、补充材料与可复现的记录口径），并单列数据与模型边界章节。</span>
+            </div>
+          </div>
+
+          <div class="prose">
+            <p>
+              论文正在投递中，因此本站不提供全文下载。如需手稿全文、图表或复现材料，可以通过<a href="../index.html#contact">邮件索取</a>；
+              也可以<a href="#overview">回到概览</a>。
+            </p>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <nav class="pager" aria-label="项目导航">
+    <a href="../index.html#work">
+      <span class="pager__label">Index</span>
+      <span class="pager__title">← 返回全部项目</span>
+    </a>
+    <a href="nev-policy.html" style="text-align:right">
+      <span class="pager__label">Next project · 02</span>
+      <span class="pager__title">新能源汽车消费政策评估与福利核算 →</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <span>© <span id="year">2026</span> 刘问鼎 · 静态页面，无外部依赖与追踪脚本</span>
+    <a class="to-top" href="#main">
+      回到顶部
+      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V3M4 7l4-4 4 4"/></svg>
+    </a>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js" defer></script>
+</body>
+</html>
